@@ -1,0 +1,19 @@
+services:
+  harness:
+    build: .
+    image: validator-harness
+    volumes:
+      # The artifact share: what S3 or EFS is in production. Tarballs plus their registry rows land here.
+      - artifacts:/opt/validator/artifacts
+      # The task's ephemeral disk. It outlives a container, so a second `demo` run starts from cache hits.
+      - cache:/opt/validator/cache
+      # To browse the files from the host instead, replace the first line with a bind mount:
+      #   - ./artifacts:/opt/validator/artifacts
+    environment:
+      VH_CACHE_MAX_MB: "64"
+    # The task's memory, as Fargate would cap it. The harness budgets against this number; the kernel enforces it.
+    mem_limit: 4g
+
+volumes:
+  artifacts:
+  cache:
